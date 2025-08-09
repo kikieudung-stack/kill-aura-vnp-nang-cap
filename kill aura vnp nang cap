@@ -77,7 +77,6 @@ local function createRangeHitbox()
     hitbox.Transparency = 0.7
     hitbox.Material = Enum.Material.Neon
     hitbox.Color = color
-    -- Hình hộp mặc định
     hitbox.Parent = workspace
 
     RunService.Heartbeat:Connect(function()
@@ -166,7 +165,7 @@ local function createUI()
     screenGui.Parent = localPlayer:WaitForChild("PlayerGui")
 
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 270, 0, 190) -- tăng chiều cao đủ chỗ slider màu
+    frame.Size = UDim2.new(0, 320, 0, 190) -- rộng hơn để có chỗ nhập số
     frame.Position = UDim2.new(0, 20, 0, 50)
     frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     frame.BorderSizePixel = 0
@@ -205,7 +204,7 @@ local function createUI()
     end)
 
     local sliderBg = Instance.new("Frame")
-    sliderBg.Size = UDim2.new(1, -40, 0, 20)
+    sliderBg.Size = UDim2.new(1, -110, 0, 20)
     sliderBg.Position = UDim2.new(0, 20, 0, 50)
     sliderBg.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     sliderBg.Parent = frame
@@ -229,8 +228,8 @@ local function createUI()
     sliderButton.Draggable = true
 
     local rangeLabel = Instance.new("TextLabel")
-    rangeLabel.Size = UDim2.new(1, 0, 0, 20)
-    rangeLabel.Position = UDim2.new(0, 0, 0, 80)
+    rangeLabel.Size = UDim2.new(0, 100, 0, 20)
+    rangeLabel.Position = UDim2.new(0, 20, 0, 80)
     rangeLabel.BackgroundTransparency = 1
     rangeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     rangeLabel.Font = Enum.Font.SourceSans
@@ -245,6 +244,7 @@ local function createUI()
         sliderFill.Size = UDim2.new(range / maxRange, 0, 1, 0)
         sliderButton.Position = UDim2.new(range / maxRange, -10, 0, 0)
         rangeLabel.Text = "Range: " .. tostring(range)
+        rangeInput.Text = tostring(range)
         createRangeHitbox()
     end
 
@@ -264,7 +264,35 @@ local function createUI()
         end)
     end)
 
-    -- Tạo 3 slider chỉnh màu R, G, B
+    -- TextBox nhập số range
+    local rangeInput = Instance.new("TextBox")
+    rangeInput.Size = UDim2.new(0, 80, 0, 20)
+    rangeInput.Position = UDim2.new(1, -90, 0, 50)
+    rangeInput.PlaceholderText = tostring(range)
+    rangeInput.Text = tostring(range)
+    rangeInput.ClearTextOnFocus = false
+    rangeInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    rangeInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    rangeInput.Font = Enum.Font.SourceSans
+    rangeInput.TextSize = 18
+    rangeInput.Parent = frame
+
+    rangeInput.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            local num = tonumber(rangeInput.Text)
+            if num and num >= 0 and num <= maxRange then
+                range = math.floor(num)
+                sliderFill.Size = UDim2.new(range / maxRange, 0, 1, 0)
+                sliderButton.Position = UDim2.new(range / maxRange, -10, 0, 0)
+                rangeLabel.Text = "Range: " .. tostring(range)
+                createRangeHitbox()
+            else
+                rangeInput.Text = tostring(range)
+            end
+        end
+    end)
+
+    -- Slider màu R G B
     local redSlider = createColorSlider(frame, UDim2.new(0, 20, 0, 110), "R", red, function(val)
         red = val
         color = Color3.fromRGB(red, green, blue)
@@ -283,7 +311,6 @@ local function createUI()
         createRangeHitbox()
     end)
 
-    -- Tạo hitbox lần đầu
     createRangeHitbox()
 end
 
